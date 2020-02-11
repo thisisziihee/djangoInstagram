@@ -34,3 +34,8 @@ class Image(BaseModel):
     class Meta:
         unique_together = ['content', 'order']
         ordering = ['order']
+
+
+class FollowRelation(BaseModel):
+    follower = models.OneToOneField(User, related_name = 'follower', on_delete = models.CASCADE)
+    followee = models.ManyToManyField(User, related_name = 'followee')
