@@ -9,7 +9,8 @@ from django.db import IntegrityError
 from django.contrib.auth.models import User
     #UserLoginView
 from django.contrib.auth import authenticate, login, logout
-
+    #ContentCreateView
+from contents.models import Content, Image
 
 
 @method_decorator(csrf_exempt, name = "dispatch")
@@ -76,3 +77,11 @@ class UserLogoutView(BaseView):
         logout(request)
         return self.response()
 
+
+class ContentCreateView(BaseView):
+    def post(self, request):
+        text = request.POST.get('text', '').strip()
+        content = Content.objects.create(user = request.user, text = text)
+        for idx, file in enumerate(request.FILES.values()):
+            Image.objects.create(content = content, image = file, order = idx)
+        return self.response({})
