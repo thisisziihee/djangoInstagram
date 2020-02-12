@@ -2,6 +2,7 @@ from django.shortcuts import render
 from django.views import View
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
     #UserCreateView
 from django.core.validators import validate_email, ValidationError
@@ -10,7 +11,8 @@ from django.contrib.auth.models import User
     #UserLoginView
 from django.contrib.auth import authenticate, login, logout
     #ContentCreateView
-from contents.models import Content, Image
+from contents.models import Content, Image, FollowRelation
+
 
 
 @method_decorator(csrf_exempt, name = "dispatch")
@@ -85,3 +87,62 @@ class ContentCreateView(BaseView):
         for idx, file in enumerate(request.FILES.values()):
             Image.objects.create(content = content, image = file, order = idx)
         return self.response({})
+
+
+class UserInfoGetView(BaseView):
+    def get(self, request):
+        username = request.GET.get('username','').strip()
+        try:
+            user = User.objects.get(username = username)
+        except user.DoesNotExist:
+            self.response(message = "사용자를 찾을 수 없습니다.", status = 404)
+        return self.response({'username':username, 'email':user.email, 'id':user.id})
+
+
+@method_decorator(login_required, name = "dispatch")
+class RelationCreateView(BaseView):
+    def post(self, request):
+        try:
+            user_id = request.POST.get('id', '')
+        except ValueError:
+            return self.response(message = '잘못된 요청입니다.', status = 400)
+        
+        try:
+            relation = FollowRelation.objects.get(follower = request.user)
+        except FollowRelation.DoesNotExist:
+            relation = FollowRelation.objects.create(follower = request.user)
+        
+        try:
+            if user_id == request.user.id:
+                raise IntegrityError
+            relation.followee.add(user_id)
+            relation.save()
+        except IntegrityError:
+            return self.response(message = '잘못된 요청입니다.', status = 400)
+        
+        return self.response({})
+
+
+@method_decorator(login_required, name = 'dispatch')
+class RelationDeleteView(BaseView):
+    def post(self, request):
+        try:
+            user_id = request.POST.get('id', '')
+        except ValueError:
+            return self.response(message = "잘못된 요청입니다.", status = 400)
+
+        try:
+            relation = FollowRelation.objects.get(follower = request.user)
+        except FollowRelation.DoesNotExist:
+            return self.response(message = "잘못된 요청입니다.", status = 400)
+        
+        try:
+            if user_id == request.user.id:
+                raise IntegrityError
+            relation.followee.remove(user_id)
+            relation.save()
+        except IntegrityError:
+            return self.response(message = "잘못된 요청입니다.", stauts = 400)
+        
+        return self.respone({})
+

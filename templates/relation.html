@@ -1,0 +1,96 @@
+{% include "header.html" %}
+{% block head %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/dropzone@5.5.1/dist/dropzone.min.css">
+{% endblock %}
+
+{% block body %}
+<div class = "all" style = "width :600px; margin:0 auto;">
+    <p>사용자 찾기</p>
+    <input type = "text" id = "searchUserName" placeholder = "Enter username..">
+    <button id = "search" class = "btn-outline-success">검색</button>
+    <p><b id = "searchResult"></b><span id = "searchFollow" style = "display:none;">-<button></button></span></p>
+    <hr><hr>
+
+    <h4>날 팔로우하는 사람들</h4>
+    {% if followers %}
+    <ul class = "list-group">
+        {% for myfollower in followers %}
+        <li class = "list-group-item col-md-6">
+            {{myfollower.follower.username}}
+            {% if myfollower.follower.id not in followees_ids %}
+            - <button class = "follow btn btn-outline-success" data-user-id = "{{myfollower.follower.id}}">팔로우</button>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+
+    <h4>내가 팔로우하는 사람들</h4>
+    {% if followees %}
+    <ul class = "list-group">
+        {% for user in followees %}
+        <li class = "list-group-item col-md-6">{{user.username}} - <button class = "unfollow btn btn-outline-success" data-user-id = "{{user.id}}">언팔로우</button></li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+</div>
+
+<script
+src="https://code.jquery.com/jquery-3.4.1.min.js"
+integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+crossorigin="anonymous"></script>
+
+
+<script>
+    $(document).ready(function(){
+        $('#logout').click(function(){
+            $.get('/apis/user/logout', {}, function(){
+                location.reload();
+            });
+        });
+
+        var followeesIds = {{ followees_ids }};
+        $('#search').click(function(){
+            var username = $('#searchuserName').val();
+            $.get("{% url 'apis_user_infoget' %}", {username = username}, function(myfollower){
+                $('#searchResult').html(myfollower.data.username);
+                var $searchRelationButton = $('#searchFollow button');
+                $searchRelationButton.data('user-id', myfollower.data.id);
+                console.log(myfollower.data.id)
+                if (followeesIds.indexOf(myfollower.data.id) > -1){
+                    $searchRelationButton.removeClass('follow');
+                    $searchRelationButton.addClass('unfollow');
+                    $searchRelationButton.html('언팔로우');
+                } else {
+                    $searchRelationButton.removeClass('unfollow');
+                    $searchRelationButton.addClass('follow');
+                    $searchRelationButton.html('팔로우');
+                }
+                $('#searchFollow').show();
+            }).fail(function(data){
+                $('#searchResult').html(data.responseJSON.message);
+            });
+        });
+
+        $('body').delegate('.follow', 'click', function(e){
+            var userId = $(e.currentTarget).data('user-id');
+            $.post("{% url 'apis_relation_create' %}", {id :userId}, function(){
+                location.reload();
+            }).fail(function(data){
+                alert(data.responseJSON.message);
+            });
+        });
+
+        $('body').delegate('.unfollow', 'click', function(e){
+            var userId = $(e.currentTarget).data('user-id');
+            $.post("{% url 'apis_relation_delete' %}", {id : userId}, function(){
+                location.reload();
+            }).fail(function(data){
+                alert(data.responseJSON.message);
+            });
+        });
+    });
+
+</script>
+
+{% endblock %}
