@@ -80,6 +80,7 @@ class UserLogoutView(BaseView):
         return self.response()
 
 
+@method_decorator(login_required, name = "dispatch")
 class ContentCreateView(BaseView):
     def post(self, request):
         text = request.POST.get('text', '').strip()
@@ -96,6 +97,7 @@ class UserInfoGetView(BaseView):
             user = User.objects.get(username = username)
         except user.DoesNotExist:
             self.response(message = "사용자를 찾을 수 없습니다.", status = 404)
+
         return self.response({'username':username, 'email':user.email, 'id':user.id})
 
 
@@ -142,7 +144,7 @@ class RelationDeleteView(BaseView):
             relation.followee.remove(user_id)
             relation.save()
         except IntegrityError:
-            return self.response(message = "잘못된 요청입니다.", stauts = 400)
+            return self.response(message = "잘못된 요청입니다.", status = 400)
         
-        return self.respone({})
+        return self.response({})
 

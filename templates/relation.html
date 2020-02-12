@@ -4,7 +4,9 @@
 {% endblock %}
 
 {% block body %}
+
 <div class = "all" style = "width :600px; margin:0 auto;">
+
     <p>사용자 찾기</p>
     <input type = "text" id = "searchUserName" placeholder = "Enter username..">
     <button id = "search" class = "btn-outline-success">검색</button>
@@ -12,12 +14,17 @@
     <hr><hr>
 
     <h4>날 팔로우하는 사람들</h4>
+        <!--나를 팔로우 하는 사람(followers) 가 있다면-->
     {% if followers %}
     <ul class = "list-group">
         {% for myfollower in followers %}
         <li class = "list-group-item col-md-6">
             {{myfollower.follower.username}}
-            {% if myfollower.follower.id not in followees_ids %}
+                <!--나를 팔로우하는 사람을 내가 팔로우하지 않은 경우-->
+            {% if myfollower.follower.id in followees_ids %}
+            - <button class = "unfollow btn btn-outline-success" data-user-id = "{{myfollower.follower.id}}">언팔로우</button>
+
+            {% else %}
             - <button class = "follow btn btn-outline-success" data-user-id = "{{myfollower.follower.id}}">팔로우</button>
             {% endif %}
         </li>
@@ -26,6 +33,7 @@
     {% endif %}
 
     <h4>내가 팔로우하는 사람들</h4>
+        <!--내가 팔로우하는 사람(followees)이 있다면-->
     {% if followees %}
     <ul class = "list-group">
         {% for user in followees %}
@@ -43,20 +51,28 @@ crossorigin="anonymous"></script>
 
 <script>
     $(document).ready(function(){
-        $('#logout').click(function(){
+
+        // 로그아웃 로직
+        $('#logoutButton').click(function(){
             $.get('/apis/user/logout', {}, function(){
                 location.reload();
             });
         });
 
-        var followeesIds = {{ followees_ids }};
+
         $('#search').click(function(){
-            var username = $('#searchuserName').val();
-            $.get("{% url 'apis_user_infoget' %}", {username = username}, function(myfollower){
+            var username = $('#searchUserName').val();
+            var followeesIds = "{{followees_ids}}";
+            $.get("{% url 'apis_user_infoget' %}", {'username' :username}, function(myfollower){
                 $('#searchResult').html(myfollower.data.username);
                 var $searchRelationButton = $('#searchFollow button');
                 $searchRelationButton.data('user-id', myfollower.data.id);
+
+                console.log(username)
                 console.log(myfollower.data.id)
+                console.log(followeesIds)
+                console.log(followeesIds.indexOf(myfollower.data.id))
+                
                 if (followeesIds.indexOf(myfollower.data.id) > -1){
                     $searchRelationButton.removeClass('follow');
                     $searchRelationButton.addClass('unfollow');

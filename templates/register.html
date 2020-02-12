@@ -35,7 +35,7 @@
 <script>
     $(document).ready(function(){
         $('#register').click(function() {
-            $.post('apis/user/create/', 
+            $.post('/apis/user/create/', 
             {'username' : $('#username').val(), 'password': $('#password').val(), 'email' : $('#email').val()},
             function() {
                 alert('가입을 환영합니다!');

@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block body %}
+<nav class = "fast-nav navbar navbar-expand-lg navbar-light bg-white" style = "width : 1000px; margin : 0 auto;">
+    <a class = "navbar-brand text-success col-sm-8" href = "{% url 'home' %}"><b>jiheestagram</b></a>
+    <div class = "collapse navbar-collapse col-sm-4" id = "navbarText" style = "display:inline-block !important; text-align:right;">
+        <span class = "navbar-text col-sm-3">
+            {{ request.user }}
+        </span>
+        <span class = "navbar-text col-sm-3">
+            <a href = "{%url 'relation' %}">친구 목록</a>
+        </span>
+        <span class = "navbar-text col-sm-3">
+            <a href = "javascript:void(0);" id = "logoutButton">로그아웃</a>
+        </span>
+    </div>
+</nav>
+
+{% endblock %}

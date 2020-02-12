@@ -9,10 +9,7 @@
     <a class = "navbar-brand text-success col-sm-8" href = "{% url 'home' %}"><b>jiheestagram</b></a>
     <div class = "collapse navbar-collapse col-sm-4" id = "navbarText" style = "display:inline-block !important; text-align:right;">
         <span class = "navbar-text col-sm-3">
-            {{ request.user }}
-        </span>
-        <span class = "navbar-text col-sm-3">
-            <a href = "{%url 'home' %}">친구 목록</a>
+            <a href = "{%url 'relation' %}">친구 목록</a>
         </span>
         <span class = "navbar-text col-sm-3">
             <a href = "javascript:void(0);" id = "logoutButton">로그아웃</a>
@@ -20,35 +17,9 @@
     </div>
 </nav>
 
-<div id = "login" style = "width:600px; margin:0 auto;">
-    <div class = "container">
-        {% if request.user is None %}
-            <h2 class = "text-success">Login</h2><br>
-            <hr>
-            <div class = "form-group col-md-6">
-                <label for = "username" class = "text-success">Username : </label><br>
-                <input type = "text" name = "username" id = "username" class = "form-control">
-            </div>
-            <div class = "form-group col-md-6">
-                <label for = "password" class = "text-success">Password : </label><br>
-                <input type = "password" name = "password" id = "password" class = "form-control">
-            </div>
-            <div class = "form-group col-md-6">
-                <div class = "row">
-                    <input type = "submit" id = "loginButton" class = "form-control btn btn-success" value = "submit">
-                </div>
-            </div>
-            <div class = "form-group col-md-6">
-                <div class = "row">
-                    <a href = "{% url 'register' %}" class = "form-control btn btn-outline-success">Register Here</a>
-                </div>
-            </div>
-        {% else %}
-            <br><br>
-            <h2 class = "text-success">{{request.user}}</h2><br>
-            <h4 class = "text-success">이미 로그인 되어있음</h4>
-        {% endif %}
-    </div>
+<div style = "width:600px; margin:0 auto;">
+    <br><br>
+    <h2 class = "text-success">{{request.user}}</h2><br>
 </div>
 
 <script 
@@ -66,12 +37,32 @@
     </form>
     <div class = "form-group">
         <label>아래에 글을 입력해주세요.</label>
-        <textarea class = "form-control rounded-0" id = "Text" rows = "3"></textarea>
+        <textarea class = "form-control rounded-0" id = "text" rows = "3"></textarea>
     </div>
     <div style = "text-align: right;">
         <button type = "button" class = "btn btn-success" id = "upload">작성하기</button>
     </div>
 </div>
+
+{% for content in contents %}
+{% for image in content.image_set.all %}
+<div class = "content" style = "width:600px; margin: 0 auto;">
+    <div class = "post">
+        <div class = "text-center user-block">
+            <h5 class = "text-info left-things">{{content.user.username}}</h5>
+            <img class = "img-info img-circle img-bordered-sm" src = "{{image.image.url}}" alt = "User Image" style = "width :400px; height:auto; margin: 0 auto;">
+            {% endfor %}
+            <div>
+                <span class = "username left-things">
+                    <a href = "#" class = "text-info"><b>{{content.user.username}}</b></a>
+                    <a href = "#" class = "pull-right btn-box-tool"><i class = "fa fa-times"></i></a>
+                </span>
+            </div>
+            <p>{{content.text}}</p>
+        </div>
+    </div>
+</div>
+{% endfor %}
 
 <script>
     Dropzone.autoDiscover = false;
