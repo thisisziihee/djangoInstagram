@@ -15,7 +15,7 @@ class ImageAdmin(admin.ModelAdmin):
     pass
 
 class FollowRelationAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('follower', )
 
 
 admin.site.register(Content, ContentAdmin)

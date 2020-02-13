@@ -5,6 +5,8 @@
 {% endblock %}
 
 {% block body %}
+
+<!--Header-->
 <nav class = "fast-nav navbar navbar-expand-lg navbar-light bg-white" style = "width : 1000px; margin : 0 auto;">
     <a class = "navbar-brand text-success col-sm-8" href = "{% url 'home' %}"><b>jiheestagram</b></a>
     <div class = "collapse navbar-collapse col-sm-4" id = "navbarText" style = "display:inline-block !important; text-align:right;">
@@ -17,6 +19,7 @@
     </div>
 </nav>
 
+<!--username-->
 <div style = "width:600px; margin:0 auto;">
     <br><br>
     <h2 class = "text-success">{{request.user}}</h2><br>
@@ -29,7 +32,9 @@
 <script src="https://cdn.jsdelivr.net/npm/dropzone@5.5.1/dist/dropzone.min.js"></script>
 
 
+
 <br>
+<!--Create Content-->
 <div id = "formContainer" style = "width:600px; margin:0 auto;">
     <form action = "{% url 'apis_content_create' %}" class = "dropzone" id = "uploader" style = "background-color:whitesmoke;">
         <div class = "dz-message" data-dz-message><span>드래그 드랍하거나 클릭하여 이미지 선택</span></div>

@@ -15,5 +15,16 @@
         </span>
     </div>
 </nav>
+<script>
+$(document).ready(function(){
+
+    // 로그아웃 로직
+    $('#logoutButton').click(function(){
+        $.get('/apis/user/logout', {}, function(){
+            location.reload();
+        });
+    });
+});
+</script>
 
 {% endblock %}

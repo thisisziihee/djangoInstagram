@@ -85,7 +85,9 @@ class ContentCreateView(BaseView):
     def post(self, request):
         text = request.POST.get('text', '').strip()
         content = Content.objects.create(user = request.user, text = text)
+        print("FILE value : ", request.FILES.values())
         for idx, file in enumerate(request.FILES.values()):
+            print("idx : ",idx," file : ", file)
             Image.objects.create(content = content, image = file, order = idx)
         return self.response({})
 
@@ -104,6 +106,8 @@ class UserInfoGetView(BaseView):
 @method_decorator(login_required, name = "dispatch")
 class RelationCreateView(BaseView):
     def post(self, request):
+
+            # 팔로우하려는 아이디(user_id)가 있는 아이디인지 확인
         try:
             user_id = request.POST.get('id', '')
         except ValueError:
